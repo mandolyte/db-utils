@@ -1,6 +1,0 @@
-id,count(e.id)
-/usr/share/doc,1713
-/usr/src/linux-headers-4.13.0-25-generic/include/config,1663
-/usr/src/linux-headers-4.13.0-31-generic/include/config,1663
-/usr/src/linux-headers-4.13.0-32-generic/include/config,1663
-/usr/src/linux-headers-4.13.0-16-generic/include/config,1662

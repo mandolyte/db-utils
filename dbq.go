@@ -20,6 +20,10 @@ type Dbq struct {
 	// is the column headers. If this is not needed, then
 	// simply discard the results from first use of this function.
 	RowReader func([]string) error
+	// ColumnReader is a user provided function to handle the column 
+	// headers of the result set. It will be called prior to any
+	// rows given to the RowReader.
+	ColumnReader func([]string) error
 }
 
 // Query is the method to execute the query and manage results
@@ -36,9 +40,11 @@ func (dbq *Dbq) Query() error {
 	}
 
 	// send the headers
-	err = dbq.RowReader(columns)
-	if err != nil {
-		return err
+	if dbq.ColumnReader != nil {
+		err = dbq.ColumnReader(columns)
+		if err != nil {
+			return err
+		}
 	}
 
 	for rows.Next() {

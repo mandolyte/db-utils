@@ -87,3 +87,21 @@ from results
 2018/02/08 09:08:58 Elapsed Time: 1.328337719s
 $ 
 ```
+
+The next query demonstrates the use of an input CSV to drive 
+substitution parameters in the SQL. The SQL query is executed
+once per row with values from the input.
+This execution set two extra arguments: `-input` and `-parameters`.
+See the script `q5.sh` for details.
+```
+$ sh q5.sh
+running query q5.sql
+2018/02/09 14:20:03 SQL is:
+select id
+from node
+where id like (? || '%')
+and id like ('%' || ?)
+2018/02/09 14:20:04 Total Rows: 277
+2018/02/09 14:20:04 Elapsed Time: 762.919339ms
+$
+```
