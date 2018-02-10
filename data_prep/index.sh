@@ -3,7 +3,7 @@
 echo Start indexing at `date`
 
 # remove the db and start from scratch
-rm hier.db
+cd $HOME/data/hier
 
 sqlite3 hier.db <<-EoF
 create unique index nodeidx on node(id)

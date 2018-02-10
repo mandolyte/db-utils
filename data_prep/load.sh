@@ -3,7 +3,8 @@
 echo Start create and import at `date`
 
 # remove the db and start from scratch
-rm hier.db
+cd $HOME/data/hier
+rm -f hier.db
 
 sqlite3 hier.db <<-EoF
 CREATE TABLE node (

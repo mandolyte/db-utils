@@ -53,6 +53,8 @@ $ wc -l hier_base.csv
 $ # remove the "Fullpath" header!
 ```
 
+NOTE: the above can be run with the `frun.sh` script.
+
 For next step, I'll create two output files, one for a node table and one 
 for an edge table.
 
