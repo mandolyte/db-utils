@@ -9,18 +9,18 @@ import (
 
 // Dbq is the struct for running the query and managing the results
 type Dbq struct {
-	// Db is the opened database 
-	Db        *sql.DB
+	// Db is the opened database
+	Db *sql.DB
 	// SQL is the SQL query to execute
-	SQL       string
+	SQL string
 	// Args is a slice of values to pass into SQL statement
-	Args      []interface{}
+	Args []interface{}
 	// RowReader is a user provided function to handle each row
 	// returned row from query. Note that the first row returned
 	// is the column headers. If this is not needed, then
 	// simply discard the results from first use of this function.
 	RowReader func([]string) error
-	// ColumnReader is a user provided function to handle the column 
+	// ColumnReader is a user provided function to handle the column
 	// headers of the result set. It will be called prior to any
 	// rows given to the RowReader.
 	ColumnReader func([]string) error
@@ -66,4 +66,14 @@ func (dbq *Dbq) Query() error {
 		}
 	}
 	return nil
+}
+
+// Exec is the method to execute the query and manage results
+func (dbq *Dbq) Exec() (int64, error) {
+
+	result, err := dbq.Db.Query(dbq.SQL, dbq.Args...)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
 }
