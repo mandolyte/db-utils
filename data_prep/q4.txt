@@ -1,2 +1,0 @@
-max(level),count(*)
-11,8497

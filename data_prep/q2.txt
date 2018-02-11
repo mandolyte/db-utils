@@ -1,6 +1,0 @@
-id,count(e.id)
-/usr/local/go/test/fixedbugs,1138
-/usr/local/go/src/runtime,453
-/usr/include/linux,445
-/usr/local/go/test,284
-/usr/share/doc,254
