@@ -62,10 +62,12 @@ func main() {
 	}
 
 	// create the Dbq struct...
-	x := &dbq.Dbq{Db: db, SQL: sqlS}
+	x := &dbutils.Dbu{Db: db, SQL: sqlS}
 
+	var rowsAffected int64 
+	var exerr error
 	if *input == "" {
-		singleExec(db, sqlS, theRowReader, theHeadersReader)
+		rowsAffected, exerr = singleExec(x)
 	} else {
 		if *parameters == "" {
 			usage("Parameters for input CSV are missing")
@@ -82,45 +84,49 @@ func main() {
 		r.FieldsPerRecord = -1
 
 		// get parameter column numbers
-		parms := strings.Split(*parameters, ",")
+		parms := strings.Split(*parameters,",") // as strings
+		// now convert...
+		parmcolumns := getParameterColumns(parms)
 
 		// process input
-		multiExec(db, sqlS, theRowReader, theHeadersReader, r, parms)
+		rowsAffected, exerr = multiExec(x, r, parmcolumns)
+	}
+	if exerr != nil {
+		log.Fatalf("dbutils.Exec() error: %v", exerr)
 	}
 
 	stop := time.Since(now)
-	dbg(fmt.Sprintf("Total Affected Rows: %v\n", rows))
+	dbg(fmt.Sprintf("Total Affected Rows: %v\n", rowsAffected))
 	dbg(fmt.Sprintf("Elapsed Time: %v\n", stop))
 
 }
 
-func singleExec(db *sql.DB, sqlS string, theReader, headers func([]string) error) {
-	err := x.Query()
-	if err != nil {
-		log.Fatalf("Error:%v\n", err)
-	}
-
-}
-
-func multiExec(db *sql.DB, sqlS string, theReader, colHeaders func([]string) error, r *csv.Reader, parms []string) {
+func getParameterColumns(p []string) []int {
 	// create ints from parm list
-	parmindex := make([]int, len(parms))
-	for n := range parms {
-		i, err := strconv.Atoi(parms[n])
+	parmindex := make([]int,len(p))
+	for n := range p {
+		i, err := strconv.Atoi(p[n])
 		if err != nil {
-			log.Fatalf("Parameter is not number: %v\n", parms[n])
+			log.Fatalf("Parameter is not number: %v\n", p[n])
 		}
 		// account for offset being one-based instead of zero
-		parmindex[n] = i - 1
+		parmindex[n] = i-1
 	}
+	return parmindex
+	
+}
 
-	// read loop for CSV
-	firstDataRow := true
-	headerRow := true
-	var rerr error
+func singleExec(x *dbutils.Dbu) (int64,error) {
+	rowsAffected, err := x.Exec()
+	return rowsAffected,err
+}
+
+func multiExec(x *dbutils.Dbu, r *csv.Reader, parms []int) (int64,error) {
+	var headerRow = true
+	var totalRowsAffected int64
 	for {
 		// read the csv file
-		cells, rerr = r.Read()
+		cells, rerr := r.Read()
 		if rerr == io.EOF {
 			break
 		}
@@ -130,31 +136,21 @@ func multiExec(db *sql.DB, sqlS string, theReader, colHeaders func([]string) err
 		if headerRow {
 			// don't use the first (header) row as data
 			headerRow = false
-			saveHeaders = cells
 			continue
 		}
 
-		parmvals := make([]interface{}, len(parmindex))
-		for n, v := range parmindex {
+		parmvals := make([]interface{}, len(parms))
+		for n, v := range parms {
 			parmvals[n] = cells[v]
 		}
 
-		if firstDataRow {
-			firstDataRow = false
-			x := &dbq.Dbq{Db: db, SQL: sqlS, RowReader: theReader, ColumnReader: colHeaders, Args: parmvals}
-			err := x.Query()
-			if err != nil {
-				log.Fatalf("Error:%v\n", err)
-			}
-			continue
-		}
-
-		x := &dbq.Dbq{Db: db, SQL: sqlS, RowReader: theReader, ColumnReader: nil, Args: parmvals}
-		err := x.Query()
+		rowsAffected, err := x.Exec()
 		if err != nil {
-			log.Fatalf("Error:%v\n", err)
+			return 0, err
 		}
+		totalRowsAffected += rowsAffected
 	}
+	return totalRowsAffected,nil
 }
 
 func usage(msg string) {
@@ -184,7 +180,7 @@ func fileToString(filename string) string {
 
 var doc = `
 Notes:
-1. If the optional input CSV is supplied, then the rows will be used to supplay
+1. If the optional input CSV is supplied, then the rows will be used to supply
 parameter values to the SQL statement. 
 2. The input CSV must be accompanied by a list of column numbers in the order
 needed to correctly drive the SQL parameter substitution. 
