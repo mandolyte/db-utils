@@ -8,9 +8,12 @@ export DN DB
 
 for i in $LIST
 do
+	echo 
+	echo ++++++++++++++++++++
+	echo Running query $i.sql
 	go run querydb.go \
-	    -query $1.sql \
-	    -output $1.txt \
+	    -query $i.sql \
+	    -output $i.txt \
 	    -driverName $DN \
 	    -urlref DB
 done

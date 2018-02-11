@@ -75,8 +75,12 @@ func main() {
 	w = csv.NewWriter(fo)
 	defer w.Flush()
 
+	// setup the basic dbutils struct
+	x := &dbutils.Dbu{Db: db, SQL: sqlS, RowReader: theRowReader}
+
 	if *input == "" {
-		singleQuery(db,sqlS,theRowReader, theHeadersReader)
+		x.RowReader=theRowReader
+		singleQuery(x)
 	} else {
 		if *parameters == "" {
 			usage("Parameters for input CSV are missing")
@@ -93,23 +97,49 @@ func main() {
 		r.FieldsPerRecord = -1
 		
 		// get parameter column numbers
-		parms := strings.Split(*parameters,",")
+		parms := strings.Split(*parameters,",") // as strings
+		// now convert...
+		parmcolumns := getParameterColumns(parms)
 		
-		// process input
-		multiQuery(db,sqlS,theRowReader, theHeadersReader,r, parms)
-	}
-	
-	
+		// get the column headers from the input CSV (they are required!)
+		// by reading the first row from input CSV
+		x.ColumnHeaders = getHeaders(r)
 
+		// process input
+		multiQuery(x, r, parmcolumns)
+	}
 
 	stop := time.Since(now)
+	// Row count includes header row
 	dbg(fmt.Sprintf("Total Rows: %v\n", rows))
 	dbg(fmt.Sprintf("Elapsed Time: %v\n", stop))
 
 }
 
-func singleQuery(db *sql.DB, sqlS string, theReader, headers func([]string) error) {
-	x := &dbq.Dbq{Db: db, SQL: sqlS, RowReader: theReader, ColumnReader: headers}
+func getHeaders(r *csv.Reader) []string {
+	cells, rerr := r.Read()
+	if rerr != nil {
+		log.Fatal("r.Read() Error:" + rerr.Error())
+	}
+	return cells
+}
+
+func getParameterColumns(p []string) []int {
+	// create ints from parm list
+	parmindex := make([]int,len(p))
+	for n := range p {
+		i, err := strconv.Atoi(p[n])
+		if err != nil {
+			log.Fatalf("Parameter is not number: %v\n", p[n])
+		}
+		// account for offset being one-based instead of zero
+		parmindex[n] = i-1
+	}
+	return parmindex
+	
+}
+
+func singleQuery(x *dbutils.Dbu) {
 	err := x.Query()
 	if err != nil {
 		log.Fatalf("Error:%v\n", err)
@@ -117,21 +147,8 @@ func singleQuery(db *sql.DB, sqlS string, theReader, headers func([]string) erro
 
 }
 
-func multiQuery(db *sql.DB, sqlS string, theReader,colHeaders func([]string) error, r *csv.Reader, parms []string) {
-	// create ints from parm list
-	parmindex := make([]int,len(parms))
-	for n := range parms {
-		i, err := strconv.Atoi(parms[n])
-		if err != nil {
-			log.Fatalf("Parameter is not number: %v\n", parms[n])
-		}
-		// account for offset being one-based instead of zero
-		parmindex[n] = i-1
-	}
-
+func multiQuery(x *dbutils.Dbu, r *csv.Reader, parms []int) {
 	// read loop for CSV
-	firstDataRow := true
-	headerRow := true
 	var rerr error
 	for {
 		// read the csv file
@@ -142,29 +159,12 @@ func multiQuery(db *sql.DB, sqlS string, theReader,colHeaders func([]string) err
 		if rerr != nil {
 			log.Fatal("r.Read() Error:" + rerr.Error())
 		}
-		if headerRow {
-			// don't use the first (header) row as data
-			headerRow = false
-			saveHeaders = cells
-			continue 
-		}
 
-		parmvals := make([]interface{}, len(parmindex))
-		for n,v := range parmindex {
+		parmvals := make([]interface{}, len(parms))
+		for n,v := range parms {
 			parmvals[n] = cells[v]
 		}
-
-		if firstDataRow {
-			firstDataRow = false	
-			x := &dbq.Dbq{Db: db, SQL: sqlS, RowReader: theReader, ColumnReader: colHeaders, Args: parmvals}		
-			err := x.Query()
-			if err != nil {
-				log.Fatalf("Error:%v\n", err)
-			}
-			continue
-		}
-
-		x := &dbq.Dbq{Db: db, SQL: sqlS, RowReader: theReader, ColumnReader: nil, Args: parmvals}
+		x.Args = parmvals
 		err := x.Query()
 		if err != nil {
 			log.Fatalf("Error:%v\n", err)
@@ -175,12 +175,27 @@ func multiQuery(db *sql.DB, sqlS string, theReader,colHeaders func([]string) err
 // the CSV Writer used by the RowReader
 var w *csv.Writer
 var cells []string
-var saveHeaders []string
 
 // Number of rows read by the RowReader
 var rows uint64
 
 func theRowReader(aRow []string) error {
+	/*
+		Note! the first time this is called it will be to write
+		out the headers. So the first call must be treated
+		differently.
+	*/
+	if rows == 0 {
+		// first time called... this is the header columns only
+		// the values in aRow will have all the columns whether
+		// for a single SQL or one driven from an input CSV
+		err := w.Write(aRow)
+		if err != nil {
+			log.Fatalf("Error on csv.Write(aRow):\n%v\n", err)
+		}
+		rows++
+		return nil
+	}
 	// Write out the rows 
 	var cols []string
 	if len(cells) > 0 {
@@ -195,23 +210,6 @@ func theRowReader(aRow []string) error {
 	}
 
 	rows++
-	return nil
-}
-
-func theHeadersReader(aRow []string) error {
-	// Write out the column headers
-	var cols []string
-	if len(cells) > 0 {
-		cols = append(cols, saveHeaders...)
-	}
-
-	cols = append(cols, aRow...)
-
-	err := w.Write(cols)
-	if err != nil {
-		log.Fatalf("Error on csv.Write(aRow):\n%v\n", err)
-	}
-
 	return nil
 }
 
