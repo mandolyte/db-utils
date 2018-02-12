@@ -6,6 +6,11 @@ echo Start indexing at `date`
 cd $HOME/data/hier
 
 sqlite3 hier.db <<-EoF
+drop index nodeidx;
+drop index edgeidx;
+drop index fromidx;
+drop index toidx;
+
 create unique index nodeidx on node(id)
 ;
 
