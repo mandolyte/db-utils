@@ -117,11 +117,29 @@ func getParameterColumns(p []string) []int {
 }
 
 func singleExec(x *dbutils.Dbu) (int64,error) {
-	rowsAffected, err := x.Exec()
+	tx, txerr := x.Db.Begin()
+	if txerr != nil {
+		log.Fatalf("db.Begin() error: %v\n", txerr)
+	}
+	rowsAffected, err := x.Exec(tx)
+	if err != nil {
+		rollbackerr := tx.Rollback()
+		return 0,fmt.Errorf("Exec() and Rollback() Errors:\n%v\nand\n%v",
+			err, rollbackerr)
+	}
+	err = tx.Commit()
+	if err != nil {
+		return 0, err
+	}
 	return rowsAffected,err
 }
 
 func multiExec(x *dbutils.Dbu, r *csv.Reader, parms []int) (int64,error) {
+	// start a transaction; otherwise too slow
+	tx, txerr := x.Db.Begin()
+	if txerr != nil {
+		log.Fatalf("db.Begin() error: %v\n", txerr)
+	}
 	var headerRow = true
 	var totalRowsAffected int64
 	for {
@@ -144,11 +162,19 @@ func multiExec(x *dbutils.Dbu, r *csv.Reader, parms []int) (int64,error) {
 			parmvals[n] = cells[v]
 		}
 
-		rowsAffected, err := x.Exec()
+		x.Args = parmvals
+
+		rowsAffected, err := x.Exec(tx)
 		if err != nil {
-			return 0, err
+			rollbackerr := tx.Rollback()
+			return 0,fmt.Errorf("Exec() and Rollback() Errors:\n%v\nand\n%v",
+				err, rollbackerr)
 		}
 		totalRowsAffected += rowsAffected
+	}
+	err := tx.Commit()
+	if err != nil {
+		return 0, err
 	}
 	return totalRowsAffected,nil
 }

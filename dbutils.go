@@ -78,7 +78,7 @@ func (dbutils *Dbu) Query() error {
 }
 
 // Exec is the method to execute the query and manage results
-func (dbutils *Dbu) Exec() (int64, error) {
+func (dbutils *Dbu) Exec(tx *sql.Tx) (int64, error) {
 
 	result, err := dbutils.Db.Exec(dbutils.SQL, dbutils.Args...)
 	if err != nil {
