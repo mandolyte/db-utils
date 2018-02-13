@@ -16,5 +16,5 @@ export DN DB
 go run querydb.go \
     -query $1.sql \
     -output $1.txt \
-    -driverName $DN \
+    -driver $DN \
     -urlref DB

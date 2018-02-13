@@ -34,4 +34,27 @@ values (?, ?, ?)
 2018/02/11 20:51:21 Elapsed Time: 1m51.276099892s
 End create and import at Sun Feb 11 20:51:21 EST 2018
 $ 
+
+The indexing script:
+```
+$ sh index.sh 
+Start indexing at Sun Feb 11 22:35:26 EST 2018
+2018/02/11 22:35:27 SQL is:
+create unique index nodeidx on node(id)
+2018/02/11 22:35:28 Total Affected Rows: 0
+2018/02/11 22:35:28 Elapsed Time: 1.951858522s
+2018/02/11 22:35:29 SQL is:
+create unique index edgeidx on edge(id)
+2018/02/11 22:35:38 Total Affected Rows: 0
+2018/02/11 22:35:38 Elapsed Time: 9.261471319s
+2018/02/11 22:35:39 SQL is:
+create index fromidx on edge(from_id)
+2018/02/11 22:35:46 Total Affected Rows: 0
+2018/02/11 22:35:46 Elapsed Time: 7.36776356s
+2018/02/11 22:35:47 SQL is:
+create index toidx on edge(to_id)
+2018/02/11 22:35:54 Total Affected Rows: 0
+2018/02/11 22:35:54 Elapsed Time: 6.5627508s
+End indexing at Sun Feb 11 22:35:54 EST 2018
+$ 
 ```

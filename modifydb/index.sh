@@ -3,8 +3,7 @@
 echo Start indexing at `date`
 
 # remove the db and start from scratch
-rm -f here.db
-DBRUL=here.db
+DBURL=here.db
 export DBURL
 
 go run modifydb.go -query node_index.sql -urlref DBURL -driverName sqlite

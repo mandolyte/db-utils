@@ -14,6 +14,6 @@ do
 	go run querydb.go \
 	    -query $i.sql \
 	    -output $i.txt \
-	    -driverName $DN \
+	    -driver $DN \
 	    -urlref DB
 done

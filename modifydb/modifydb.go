@@ -21,7 +21,7 @@ import (
 // global variables - beware!
 var query = flag.String("query", "", "SQL statement filename")
 var urlref = flag.String("urlref", "", "Environment variable with DB URL")
-var driverName = flag.String("driverName", "", "Driver name; required")
+var driver = flag.String("driver", "", "Driver name; required")
 var help = flag.Bool("help", false, "Show help message")
 var debug = flag.Bool("debug", true, "Show debug messages")
 
