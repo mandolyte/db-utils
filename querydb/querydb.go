@@ -9,8 +9,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"strings"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/mandolyte/db-utils"
@@ -27,7 +27,7 @@ var help = flag.Bool("help", false, "Show help message")
 var debug = flag.Bool("debug", true, "Show debug messages")
 
 var input = flag.String("input", "", "Optional input CSV supplying parameters to SQL query")
-var parameters = flag.String("parameters", "", 
+var parameters = flag.String("parameters", "",
 	"Comma delimited list of olumn numbers of input CSV in order needed;\nfirst is 1, not zero")
 
 func main() {
@@ -45,8 +45,8 @@ func main() {
 		usage(fmt.Sprintf("ERROR: missing URL from os.Getenv('%v')\n", *urlref))
 	}
 
-	if *driverName == "" {
-		usage("ERROR: driverName is missing\n")
+	if *driver == "" {
+		usage("ERROR: driver is missing\n")
 	}
 
 	if *query == "" {
@@ -61,7 +61,7 @@ func main() {
 	sqlS := fileToString(*query)
 
 	// open database
-	db, dberr := sql.Open(*driverName, urlvar)
+	db, dberr := sql.Open(*driver, urlvar)
 	if dberr != nil {
 		log.Fatalf("ERROR: sql.Open() connection failed: %v", dberr)
 	}
@@ -79,7 +79,7 @@ func main() {
 	x := &dbutils.Dbu{Db: db, SQL: sqlS, RowReader: theRowReader}
 
 	if *input == "" {
-		x.RowReader=theRowReader
+		x.RowReader = theRowReader
 		singleQuery(x)
 	} else {
 		if *parameters == "" {
@@ -95,12 +95,12 @@ func main() {
 		r := csv.NewReader(fi)
 		// ignore expectations of fields per row
 		r.FieldsPerRecord = -1
-		
+
 		// get parameter column numbers
-		parms := strings.Split(*parameters,",") // as strings
+		parms := strings.Split(*parameters, ",") // as strings
 		// now convert...
 		parmcolumns := getParameterColumns(parms)
-		
+
 		// get the column headers from the input CSV (they are required!)
 		// by reading the first row from input CSV
 		x.ColumnHeaders = getHeaders(r)
@@ -126,17 +126,17 @@ func getHeaders(r *csv.Reader) []string {
 
 func getParameterColumns(p []string) []int {
 	// create ints from parm list
-	parmindex := make([]int,len(p))
+	parmindex := make([]int, len(p))
 	for n := range p {
 		i, err := strconv.Atoi(p[n])
 		if err != nil {
 			log.Fatalf("Parameter is not number: %v\n", p[n])
 		}
 		// account for offset being one-based instead of zero
-		parmindex[n] = i-1
+		parmindex[n] = i - 1
 	}
 	return parmindex
-	
+
 }
 
 func singleQuery(x *dbutils.Dbu) {
@@ -161,7 +161,7 @@ func multiQuery(x *dbutils.Dbu, r *csv.Reader, parms []int) {
 		}
 
 		parmvals := make([]interface{}, len(parms))
-		for n,v := range parms {
+		for n, v := range parms {
 			parmvals[n] = cells[v]
 		}
 		x.Args = parmvals
@@ -196,7 +196,7 @@ func theRowReader(aRow []string) error {
 		rows++
 		return nil
 	}
-	// Write out the rows 
+	// Write out the rows
 	var cols []string
 	if len(cells) > 0 {
 		cols = append(cols, cells...)
@@ -212,7 +212,6 @@ func theRowReader(aRow []string) error {
 	rows++
 	return nil
 }
-
 
 func usage(msg string) {
 	fmt.Println(msg)
@@ -238,6 +237,7 @@ func fileToString(filename string) string {
 	dbg(fmt.Sprintf("SQL is:\n%v\n", sqlstmt))
 	return sqlstmt
 }
+
 var doc = `
 Notes:
 1. If the optional input CSV is supplied, then the rows will be used to supplay

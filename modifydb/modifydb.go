@@ -16,6 +16,7 @@ import (
 	"github.com/mandolyte/db-utils"
 
 	_ "github.com/cznic/sqlite"
+	_ "github.com/lib/pq"
 )
 
 // global variables - beware!
@@ -44,8 +45,8 @@ func main() {
 		usage(fmt.Sprintf("ERROR: missing URL from os.Getenv('%v')\n", *urlref))
 	}
 
-	if *driverName == "" {
-		usage("ERROR: driverName is missing\n")
+	if *driver == "" {
+		usage("ERROR: driver is missing\n")
 	}
 
 	if *query == "" {
@@ -56,7 +57,7 @@ func main() {
 	sqlS := fileToString(*query)
 
 	// open database
-	db, dberr := sql.Open(*driverName, urlvar)
+	db, dberr := sql.Open(*driver, urlvar)
 	if dberr != nil {
 		log.Fatalf("ERROR: sql.Open() connection failed: %v", dberr)
 	}
@@ -64,7 +65,7 @@ func main() {
 	// create the Dbq struct...
 	x := &dbutils.Dbu{Db: db, SQL: sqlS}
 
-	var rowsAffected int64 
+	var rowsAffected int64
 	var exerr error
 	if *input == "" {
 		rowsAffected, exerr = singleExec(x)
@@ -84,7 +85,7 @@ func main() {
 		r.FieldsPerRecord = -1
 
 		// get parameter column numbers
-		parms := strings.Split(*parameters,",") // as strings
+		parms := strings.Split(*parameters, ",") // as strings
 		// now convert...
 		parmcolumns := getParameterColumns(parms)
 
@@ -103,20 +104,20 @@ func main() {
 
 func getParameterColumns(p []string) []int {
 	// create ints from parm list
-	parmindex := make([]int,len(p))
+	parmindex := make([]int, len(p))
 	for n := range p {
 		i, err := strconv.Atoi(p[n])
 		if err != nil {
 			log.Fatalf("Parameter is not number: %v\n", p[n])
 		}
 		// account for offset being one-based instead of zero
-		parmindex[n] = i-1
+		parmindex[n] = i - 1
 	}
 	return parmindex
-	
+
 }
 
-func singleExec(x *dbutils.Dbu) (int64,error) {
+func singleExec(x *dbutils.Dbu) (int64, error) {
 	tx, txerr := x.Db.Begin()
 	if txerr != nil {
 		log.Fatalf("db.Begin() error: %v\n", txerr)
@@ -124,17 +125,17 @@ func singleExec(x *dbutils.Dbu) (int64,error) {
 	rowsAffected, err := x.Exec(tx)
 	if err != nil {
 		rollbackerr := tx.Rollback()
-		return 0,fmt.Errorf("Exec() and Rollback() Errors:\n%v\nand\n%v",
+		return 0, fmt.Errorf("Exec() and Rollback() Errors:\n%v\nand\n%v",
 			err, rollbackerr)
 	}
 	err = tx.Commit()
 	if err != nil {
 		return 0, err
 	}
-	return rowsAffected,err
+	return rowsAffected, err
 }
 
-func multiExec(x *dbutils.Dbu, r *csv.Reader, parms []int) (int64,error) {
+func multiExec(x *dbutils.Dbu, r *csv.Reader, parms []int) (int64, error) {
 	// start a transaction; otherwise too slow
 	tx, txerr := x.Db.Begin()
 	if txerr != nil {
@@ -167,7 +168,7 @@ func multiExec(x *dbutils.Dbu, r *csv.Reader, parms []int) (int64,error) {
 		rowsAffected, err := x.Exec(tx)
 		if err != nil {
 			rollbackerr := tx.Rollback()
-			return 0,fmt.Errorf("Exec() and Rollback() Errors:\n%v\nand\n%v",
+			return 0, fmt.Errorf("Exec() and Rollback() Errors:\n%v\nand\n%v",
 				err, rollbackerr)
 		}
 		totalRowsAffected += rowsAffected
@@ -176,7 +177,7 @@ func multiExec(x *dbutils.Dbu, r *csv.Reader, parms []int) (int64,error) {
 	if err != nil {
 		return 0, err
 	}
-	return totalRowsAffected,nil
+	return totalRowsAffected, nil
 }
 
 func usage(msg string) {
