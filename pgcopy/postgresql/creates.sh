@@ -2,7 +2,8 @@
 
 echo Start creates at `date`
 
-DBURL="postgresql://root@localhost:26257?application_name=cockroach&sslmode=disable"
+DBURL="postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable"
+#DBURL="postgresql://root@localhost:26257?application_name=cockroach&sslmode=disable"
 export DBURL
 
 echo creates statements...
