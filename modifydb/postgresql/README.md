@@ -76,21 +76,23 @@ $
 Finally, index the tables:
 ```
 $ sh index.sh
-Start indexing at Fri, Feb 16, 2018 8:27:34 AM
-2018/02/16 08:27:34 Error ioutil.ReadFile() on node_indes.sql:
-open node_indes.sql: The system cannot find the file specified.
-2018/02/16 08:27:34 SQL is:
+Start indexing at Fri, Feb 16, 2018 6:03:17 PM
+2018/02/16 18:03:17 SQL is:
+create unique index nodeidx on node(id)
+2018/02/16 18:03:17 Total Affected Rows: 0
+2018/02/16 18:03:17 Elapsed Time: 620.1285ms
+2018/02/16 18:03:17 SQL is:
 create unique index edgeidx on edge(id)
-2018/02/16 08:27:38 Total Affected Rows: 0
-2018/02/16 08:27:38 Elapsed Time: 3.598039s
-2018/02/16 08:27:38 SQL is:
+2018/02/16 18:03:22 Total Affected Rows: 0
+2018/02/16 18:03:22 Elapsed Time: 4.5415923s
+2018/02/16 18:03:22 SQL is:
 create index fromidx on edge(from_id)
-2018/02/16 08:27:41 Total Affected Rows: 0
-2018/02/16 08:27:41 Elapsed Time: 2.6677706s
-2018/02/16 08:27:41 SQL is:
+2018/02/16 18:03:24 Total Affected Rows: 0
+2018/02/16 18:03:24 Elapsed Time: 2.4918577s
+2018/02/16 18:03:24 SQL is:
 create index toidx on edge(to_id)
-2018/02/16 08:27:43 Total Affected Rows: 0
-2018/02/16 08:27:43 Elapsed Time: 2.4883815s
-End indexing at Fri, Feb 16, 2018 8:27:43 AM
+2018/02/16 18:03:27 Total Affected Rows: 0
+2018/02/16 18:03:27 Elapsed Time: 2.2526094s
+End indexing at Fri, Feb 16, 2018 6:03:27 PM
 $
 ```
