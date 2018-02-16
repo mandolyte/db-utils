@@ -29,6 +29,69 @@ $
 ```
 
 ## Linux (Ubuntu) experience
+First, create the tables into new db file:
+```
+$ sh creates.sh
+Start create at Fri Feb 16 11:44:46 EST 2018
+creates statements...
+2018/02/16 11:44:47 SQL is:
+CREATE TABLE node (
+    id text key
+)
+2018/02/16 11:44:47 Total Affected Rows: 0
+2018/02/16 11:44:47 Elapsed Time: 502.383851ms
+2018/02/16 11:44:47 SQL is:
+CREATE TABLE edge (
+    id text key,
+    from_id text not null,
+    to_id text not null
+)
+2018/02/16 11:44:47 Total Affected Rows: 0
+2018/02/16 11:44:47 Elapsed Time: 157.329233ms
+End create at Fri Feb 16 11:44:47 EST 2018
+$
+```
 
+Next load the data:
+```
+$ sh load.sh
+Start load at Fri Feb 16 11:46:50 EST 2018
+inserting into node table at Fri Feb 16 11:46:50 EST 2018
+2018/02/16 11:46:50 SQL is:
+insert into node (id)
+values (?)
+2018/02/16 11:47:11 Total Affected Rows: 96898
+2018/02/16 11:47:11 Elapsed Time: 21.541168257s
+inserting into edge table at Fri Feb 16 11:47:11 EST 2018
+2018/02/16 11:47:11 SQL is:
+insert into edge (id,from_id, to_id)
+values (?, ?, ?)
+2018/02/16 11:48:56 Total Affected Rows: 399959
+2018/02/16 11:48:56 Elapsed Time: 1m44.638819107s
+End load at Fri Feb 16 11:48:56 EST 2018
+$
+```
 
-
+Finally, index it:
+```
+$ sh index.sh
+Start indexing at Fri Feb 16 11:51:55 EST 2018
+2018/02/16 11:51:55 SQL is:
+create unique index nodeidx on node(id)
+2018/02/16 11:51:57 Total Affected Rows: 0
+2018/02/16 11:51:57 Elapsed Time: 1.922811148s
+2018/02/16 11:51:57 SQL is:
+create unique index edgeidx on edge(id)
+2018/02/16 11:52:06 Total Affected Rows: 0
+2018/02/16 11:52:06 Elapsed Time: 8.977729896s
+2018/02/16 11:52:06 SQL is:
+create index fromidx on edge(from_id)
+2018/02/16 11:52:13 Total Affected Rows: 0
+2018/02/16 11:52:13 Elapsed Time: 7.185557827s
+2018/02/16 11:52:13 SQL is:
+create index toidx on edge(to_id)
+2018/02/16 11:52:19 Total Affected Rows: 0
+2018/02/16 11:52:19 Elapsed Time: 6.488586253s
+End indexing at Fri Feb 16 11:52:19 EST 2018
+$
+```
