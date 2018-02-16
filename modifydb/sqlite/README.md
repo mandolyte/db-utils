@@ -45,6 +45,30 @@ End load at Fri Feb 16 16:08:46 STD 2018
 $
 ```
 
+Finally, the index step:
+```
+$  sh index.sh
+Start indexing at Fri Feb 16 16:15:23 STD 2018
+2018/02/16 16:15:23 SQL is:
+create unique index nodeidx on node(id)
+2018/02/16 16:15:24 Total Affected Rows: 0
+2018/02/16 16:15:24 Elapsed Time: 1.3334092s
+2018/02/16 16:15:24 SQL is:
+create unique index edgeidx on edge(id)
+2018/02/16 16:15:32 Total Affected Rows: 0
+2018/02/16 16:15:32 Elapsed Time: 8.2696662s
+2018/02/16 16:15:32 SQL is:
+create index fromidx on edge(from_id)
+2018/02/16 16:15:39 Total Affected Rows: 0
+2018/02/16 16:15:39 Elapsed Time: 6.4002363s
+2018/02/16 16:15:39 SQL is:
+create index toidx on edge(to_id)
+2018/02/16 16:15:45 Total Affected Rows: 0
+2018/02/16 16:15:45 Elapsed Time: 6.0539035s
+End indexing at Fri Feb 16 16:15:45 STD 2018
+$
+```
+
 ## Windows 10 experience
 Note that the cznic/sqlite package
 isn't working on Windows yet and fails as shown.
