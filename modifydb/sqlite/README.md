@@ -1,8 +1,52 @@
 # Notes 
 
+## Windows 10 Ubuntu subsystem
+Works!
+
+Run the create step:
+```
+$ sh creates.sh
+Start create at Fri Feb 16 16:05:10 STD 2018
+creates statements...
+2018/02/16 16:05:10 SQL is:
+CREATE TABLE node (
+    id text key
+)
+2018/02/16 16:05:10 Total Affected Rows: 0
+2018/02/16 16:05:10 Elapsed Time: 39.0029ms
+2018/02/16 16:05:10 SQL is:
+CREATE TABLE edge (
+    id text key,
+    from_id text not null,
+    to_id text not null
+)
+2018/02/16 16:05:10 Total Affected Rows: 0
+2018/02/16 16:05:10 Elapsed Time: 40.6141ms
+End create at Fri Feb 16 16:05:10 STD 2018
+```
+
+Run the load step:
+```
+$ sh load.sh
+Start load at Fri Feb 16 16:07:23 STD 2018
+inserting into node table at Fri Feb 16 16:07:23 STD 2018
+2018/02/16 16:07:23 SQL is:
+insert into node (id)
+values (?)
+2018/02/16 16:07:36 Total Affected Rows: 96898
+2018/02/16 16:07:36 Elapsed Time: 13.0487115s
+inserting into edge table at Fri Feb 16 16:07:36 STD 2018
+2018/02/16 16:07:36 SQL is:
+insert into edge (id,from_id, to_id)
+values (?, ?, ?)
+2018/02/16 16:08:46 Total Affected Rows: 399959
+2018/02/16 16:08:46 Elapsed Time: 1m9.8318125s
+End load at Fri Feb 16 16:08:46 STD 2018
+$
+```
 
 ## Windows 10 experience
-First, create the tables. Note that the cznic/sqlite package
+Note that the cznic/sqlite package
 isn't working on Windows yet and fails as shown.
 ```
 $ sh creates.sh
