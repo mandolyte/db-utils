@@ -1,26 +1,21 @@
 #!/bin/sh
 
-echo Start create and import at `date`
+echo Start load at `date`
 
-# remove the db and start from scratch
-rm -f here.db
-DBURL=here.db
-export DBURL
-
-echo creates statements...
-modifydb -query node_create.sql -urlref DBURL -driver sqlite
-modifydb -query edge_create.sql -urlref DBURL -driver sqlite
+DB=here.db
+DN=$DN
+export DB
 
 echo inserting into node table at `date`
 modifydb -query node_insert.sql \
     -input $HOME/data/hier/hier_nodes.csv \
     -parameters 1 \
-    -urlref DBURL -driver sqlite
+    -urlref DB -driver $DN
 
 echo inserting into edge table at `date`
 modifydb -query edge_insert.sql \
     -input $HOME/data/hier/hier_edges.csv \
     -parameters 1,2,3 \
-    -urlref DBURL -driver sqlite
+    -urlref DB -driver $DN
 
-echo End create and import at `date`
+echo End load at `date`

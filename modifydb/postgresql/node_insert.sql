@@ -1,1 +1,1 @@
-insert into node (id) values ( ? )
+insert into node (id) values ($1)

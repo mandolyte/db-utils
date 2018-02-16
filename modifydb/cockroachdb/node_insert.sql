@@ -1,0 +1,1 @@
+insert into public.node (id) values ($1)

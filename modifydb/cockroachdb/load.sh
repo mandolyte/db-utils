@@ -2,8 +2,7 @@
 
 echo Start create and import at `date`
 
-# remove the db and start from scratch
-DB="postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable"
+DB="postgresql://root@localhost:26257?application_name=cockroach&sslmode=disable"
 DN="postgres"
 export DB DN
 

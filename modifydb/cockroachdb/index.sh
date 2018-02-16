@@ -2,9 +2,9 @@
 
 echo Start indexing at `date`
 
-DB="postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable"
+DB="postgresql://root@localhost:26257?application_name=cockroach&sslmode=disable"
 DN="postgres"
-export DB DN
+export DB
 
 modifydb -query node_indes.sql -urlref DB -driver $DN
 modifydb -query edge_index.sql -urlref DB -driver $DN
