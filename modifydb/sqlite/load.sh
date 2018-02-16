@@ -3,7 +3,7 @@
 echo Start load at `date`
 
 DB=here.db
-DN=$DN
+DN=sqlite
 export DB
 
 echo inserting into node table at `date`
