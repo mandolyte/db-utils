@@ -4,6 +4,7 @@ package dbutils
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 )
 
@@ -24,7 +25,7 @@ type Dbu struct {
 	// headers of the result set. It will be called prior to any
 	// rows given to the RowReader.
 	ColumnHeaders []string
-	isDataRow bool
+	isDataRow     bool
 }
 
 // Query is the method to execute the query and manage results
@@ -48,12 +49,12 @@ func (dbutils *Dbu) Query() error {
 				return err
 			}
 		} else {
-			dbutils.ColumnHeaders = append(dbutils.ColumnHeaders,columns...)
+			dbutils.ColumnHeaders = append(dbutils.ColumnHeaders, columns...)
 			err = dbutils.RowReader(dbutils.ColumnHeaders)
 			if err != nil {
 				return err
 			}
-		}	
+		}
 	}
 
 	for rows.Next() {
@@ -82,7 +83,8 @@ func (dbutils *Dbu) Exec(tx *sql.Tx) (int64, error) {
 
 	result, err := tx.Exec(dbutils.SQL, dbutils.Args...)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("SQL:%v;Args:%v;Message:%v",
+			dbutils.SQL, dbutils.Args, err)
 	}
 	return result.RowsAffected()
 }
