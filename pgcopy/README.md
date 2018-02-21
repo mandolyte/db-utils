@@ -14,7 +14,7 @@ Help:
         Table name to COPY to
   -urlvar string
         Environment variable with DB URL
-The input CSV file must have headers that match the table names
+The input CSV file must have headers that match the table column names
 $
 ```
 
