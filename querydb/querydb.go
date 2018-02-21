@@ -16,6 +16,7 @@ import (
 	"github.com/mandolyte/db-utils"
 
 	_ "github.com/cznic/sqlite"
+	_ "github.com/lib/pq"
 )
 
 // global variables - beware!

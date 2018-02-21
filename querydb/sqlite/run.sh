@@ -9,11 +9,11 @@ echo running query $1
 
 ## constants ##
 DN=sqlite
-DB=/home/cecil/data/hier/hier.db
+DB=../../modifydb/sqlite/here.db
 
 export DN DB
 
-go run querydb.go \
+querydb \
     -query $1.sql \
     -output $1.txt \
     -driver $DN \

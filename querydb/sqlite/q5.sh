@@ -4,14 +4,14 @@ echo running query q5.sql
 
 ## constants ##
 DN=sqlite
-DB=/home/cecil/data/hier/hier.db
+DB=../../modifydb/sqlite/here.db
 
 export DN DB
 
-go run querydb.go \
+querydb \
     -input input1.csv \
     -parameters 1,2 \
     -query q5.sql \
     -output q5.txt \
-    -driverName $DN \
+    -driver $DN \
     -urlref DB
