@@ -102,3 +102,8 @@ and id like ('%' || $2)
 2018/02/19 09:52:04 Elapsed Time: 106.9699ms
 $
 ```
+
+Note that the postgres query returns 261 rows whereas the sqlite query
+returns 278. The sqlite query is case insensitive and returns results
+with capital letters. The matches the behavior of sqlite3 CLI.
+See the sqlite folder for details.

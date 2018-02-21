@@ -107,3 +107,33 @@ and id like ('%' || ?)
 2018/02/19 10:06:44 Elapsed Time: 546.1548ms
 $
 ```
+
+Note that the postgres query returns 261 rows whereas the sqlite query
+returns 278. The sqlite query is case insensitive and returns results
+with capital letters. The matches the behavior of sqlite3 CLI:
+```
+$ sqlite3 test.db
+SQLite version 3.11.0 2016-02-15 17:29:24
+Enter ".help" for usage hints.
+sqlite> create table test (
+   ...>  cola text
+   ...> );
+sqlite> .schema
+CREATE TABLE test (
+ cola text
+);
+sqlite> insert into test values ('aWonderfulLife');
+sqlite> insert into test values ('toBeOrNotToBe');
+sqlite> insert into test values ('AWonderfulLife');
+sqlite> insert into test values ('ToBeOrNotToBe');
+sqlite> select * from test;
+aWonderfulLife
+toBeOrNotToBe
+AWonderfulLife
+ToBeOrNotToBe
+sqlite> select * from test where cola like 'a%';
+aWonderfulLife
+AWonderfulLife
+sqlite> .quit
+$
+```
