@@ -1,5 +1,5 @@
 #!/bin/sh
-
+START=`date`
 if [ "$1x" = "x" ]; then
     echo query arg is mising - do not include extension
     echo for example: q1
@@ -18,3 +18,5 @@ querydb \
     -output $1.txt \
     -driver $DN \
     -urlref DB
+echo started at `date`
+echo ..ended at `date`
